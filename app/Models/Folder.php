@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Folder extends Model
 {
 	use HasFactory;
-	public function children()
+
+	public function foldersin()
 	{
 		return $this->hasMany(Folder::class, "root_id");
 	}

@@ -8,6 +8,7 @@ use App\Models\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class FolderController extends BaseController
 {
@@ -35,6 +36,22 @@ class FolderController extends BaseController
 	public function store(Request $request)
 	{
 		//
+		$input = $request->all();
+		$validator = Validator::make($input, [
+			"name" => "required",
+		]);
+		if ($validator->fails()) {
+			return $this->sendError("Validation Error.", $validator->errors());
+		}
+
+		$folder = new Folder();
+		$folder->name = $input["name"];
+		$folder->owner()->associate(Auth::user());
+		$folder->save();
+		return $this->sendResponse(
+			new FolderResource($folder),
+			"Folder created successfully."
+		);
 	}
 
 	/**
@@ -46,6 +63,10 @@ class FolderController extends BaseController
 	public function show(Folder $folder)
 	{
 		//
+		return $this->sendResponse(
+			new FolderResource($folder),
+			"Folder retrieved successfully."
+		);
 	}
 
 	/**
@@ -53,11 +74,31 @@ class FolderController extends BaseController
 	 *
 	 * @param  \Illuminate\Http\Request  $request
 	 * @param  \App\Models\Folder  $folder
-	 * @return \Illuminate\Http\Response
+	 * @return mixed
 	 */
 	public function update(Request $request, Folder $folder)
 	{
 		//
+		$input = $request->all();
+
+		$validator = Validator::make($input, [
+			"name" => "required",
+		]);
+		if ($validator->fails()) {
+			return $this->sendError("Validation Error.", $validator->errors());
+		}
+		if (isset($input["name"])) {
+			$folder->name = $input["name"];
+		}
+		if (isset($input["root_id"])) {
+			$folder->root_id = $input["root_id"];
+		}
+
+		$folder->save();
+		return $this->sendResponse(
+			new FolderResource($folder),
+			"Folder updated successfully."
+		);
 	}
 
 	/**
@@ -68,6 +109,11 @@ class FolderController extends BaseController
 	 */
 	public function destroy(Folder $folder)
 	{
-		//
+		// || $folder->id != Auth::user()->getAuthIdentifier()
+		if (is_null($folder)) {
+			$this->sendError("Folder not found");
+		}
+		$folder->delete();
+		return $this->sendResponse([], "Folder deleted succesfully");
 	}
 }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\FolderController;
 use App\Http\Controllers\API\RegisterController;
+use App\Models\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,4 +27,11 @@ Route::controller(RegisterController::class)->group(function () {
 
 Route::middleware("auth:sanctum")->group(function () {
 	Route::apiresource("folders", FolderController::class);
+	Route::get("test", function () {
+		$f = Folder::findOrFail(2);
+		$f2 = new Folder();
+		$f2->name = "test3";
+		$f2->user_id = 2;
+		$f->foldersin()->save($f2);
+	});
 });

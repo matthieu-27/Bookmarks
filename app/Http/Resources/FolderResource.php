@@ -20,7 +20,14 @@ class FolderResource extends JsonResource
 			"updated_at" => $this->updated_at,
 			"name" => $this->name,
 			"root_id" => $this->root_id,
-			"user_id" => $this->user_id,
+			// "user_id" => $this->user_id,
+			// "childs" => FolderResource::collection($this->foldersin),
+			"links" => [
+				"show" => route("folders.show", $this->id),
+				"store" => route("folders.store"),
+				"udpate" => route("folders.update", $this->id),
+				"destroy" => route("folders.destroy", $this->id),
+			],
 		];
 	}
 }

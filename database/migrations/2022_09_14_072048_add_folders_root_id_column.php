@@ -17,7 +17,8 @@ return new class extends Migration {
 			$table
 				->foreignId("root_id")
 				->nullable()
-				->constrained("folders");
+				->constrained("folders")
+				->onDelete("cascade");
 		});
 	}
 
