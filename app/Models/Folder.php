@@ -9,6 +9,11 @@ class Folder extends Model
 {
 	use HasFactory;
 
+	public function bookmarks()
+	{
+		return $this->hasMany(Bookmark::class);
+	}
+
 	public function foldersin()
 	{
 		return $this->hasMany(Folder::class, "root_id");

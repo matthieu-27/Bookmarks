@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\BookmarkController;
 use App\Http\Controllers\API\FolderController;
 use App\Http\Controllers\API\RegisterController;
 use App\Models\Folder;
@@ -27,6 +28,8 @@ Route::controller(RegisterController::class)->group(function () {
 
 Route::middleware("auth:sanctum")->group(function () {
 	Route::apiresource("folders", FolderController::class);
+	Route::apiresource("bookmarks", BookmarkController::class);
+	// Route::apiresource("folders.", BookmarkController::class);
 	// Route::get("test", function () {
 	// 	$f = Folder::findOrFail(2);
 	// 	$f2 = new Folder();

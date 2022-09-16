@@ -12,12 +12,9 @@ return new class extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create("bookmarks", function (Blueprint $table) {
-			$table->id();
-			$table->timestamps();
-			$table->string("title");
-			$table->string("url");
-			$table->string("comment")->nullable();
+		//
+		Schema::table("bookmarks", function (Blueprint $table) {
+			$table->foreignId("folder_id")->constrained("folders");
 		});
 	}
 
@@ -28,6 +25,9 @@ return new class extends Migration {
 	 */
 	public function down()
 	{
-		Schema::dropIfExists("bookmarks");
+		//
+		Schema::table("bookmarks", function (Blueprint $table) {
+			$table->dropConstrainedForeignId("folder_id");
+		});
 	}
 };
