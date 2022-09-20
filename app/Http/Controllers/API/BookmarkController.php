@@ -102,6 +102,11 @@ class BookmarkController extends BaseController
 	{
 		//
 		$input = $request->all();
+
+		if (!Gate::allows('user_bookmark', $bookmark)) {
+			return $this->sendError(null, "Unauthorized access to bookmark", 403);
+		}
+
 		$regex = '/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/';
 
 		$validator = Validator::make($input, [
@@ -113,12 +118,18 @@ class BookmarkController extends BaseController
 			return $this->sendError("Validation Error.", $validator->errors());
 		}
 
-		if ($input["folder_id"] != $bookmark->folder()->first()->id) {
-			$folder = Folder::findOrFail($input["folder_id"]);
-			if (!Gate::allows("user_folder", $folder)) {
-				return $this->sendError("Unauthorized access to folder", "Unauthorized access to folder", 403);
+		if (!isset($input["folder_id"])) {
+			$folder = $bookmark->folder()->first();
+		} else {
+			if ($input["folder_id"] != $bookmark->folder()->first()->id) {
+				$folder = Folder::findOrFail($input["folder_id"]);
 			}
 		}
+
+		if (!Gate::allows("user_folder", $folder)) {
+			return $this->sendError("Unauthorized access to folder", "Unauthorized access to folder", 403);
+		}
+
 
 		foreach ($input as $key => $value) {
 			if (isset($input[$key])) {
