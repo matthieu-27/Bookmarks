@@ -5,9 +5,12 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BookmarkResource;
 use App\Models\Bookmark;
+use App\Models\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
 class BookmarkController extends BaseController
@@ -46,18 +49,24 @@ class BookmarkController extends BaseController
 		$validator = Validator::make($input, [
 			"title" => "required",
 			"url" => "required|url|regex:" . $regex,
+			"folder_id" => "integer"
 		]);
 
 		if ($validator->fails()) {
 			return $this->sendError("Validation Error.", $validator->errors());
 		}
 
-		$bookmark = new Bookmark();
-		$bookmark->title = $input["title"];
-		$bookmark->url = $input["url"];
-		$bookmark->comment = $input["comment"];
-		$bookmark->folder_id = $input["folder_id"];
+		$folder = Folder::findOrFail($input["folder_id"]);
 
+		if (!Gate::allows("user_folder", $folder)) {
+			return $this->sendError("Unauthorized access to folder", "Unauthorized access to folder", 403);
+		}
+		$bookmark = new Bookmark();
+		foreach ($input as $key => $value) {
+			if (Schema::hasColumn("bookmarks", $key)) {
+				$bookmark->$key = $value;
+			}
+		}
 		$bookmark->save();
 		return $this->sendResponse(
 			new BookmarkResource($bookmark),
@@ -73,6 +82,9 @@ class BookmarkController extends BaseController
 	 */
 	public function show(Bookmark $bookmark)
 	{
+		if (!Gate::allows('user_bookmark', $bookmark)) {
+			return $this->sendError(null, "Unauthorized access to bookmark", 403);
+		}
 		return $this->sendResponse(
 			new BookmarkResource($bookmark),
 			"Bookmark retrieved successfully."
@@ -93,22 +105,27 @@ class BookmarkController extends BaseController
 		$regex = '/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/';
 
 		$validator = Validator::make($input, [
-			"title" => "required",
-			"url" => "required|url|regex:" . $regex,
+			"url" => "regex:" . $regex,
+			"folder_id" => "integer"
 		]);
+
 		if ($validator->fails()) {
 			return $this->sendError("Validation Error.", $validator->errors());
 		}
 
-		// foreach ($request as $key => $value) {
-		// 	$bookmark->$key = $value;
-		// }
-
-		if (isset($input["title"])) {
-			$bookmark->title = $input["title"];
+		if ($input["folder_id"] != $bookmark->folder()->first()->id) {
+			$folder = Folder::findOrFail($input["folder_id"]);
+			if (!Gate::allows("user_folder", $folder)) {
+				return $this->sendError("Unauthorized access to folder", "Unauthorized access to folder", 403);
+			}
 		}
-		if (isset($input["url"])) {
-			$bookmark->url = $input["url"];
+
+		foreach ($input as $key => $value) {
+			if (isset($input[$key])) {
+				if (Schema::hasColumn("bookmarks", $key)) {
+					$bookmark->$key = $value;
+				}
+			}
 		}
 
 		$bookmark->save();
@@ -126,9 +143,8 @@ class BookmarkController extends BaseController
 	 */
 	public function destroy(Bookmark $bookmark)
 	{
-		// || $folder->id != Auth::user()->getAuthIdentifier()
-		if (is_null($bookmark)) {
-			$this->sendError("Bookmark not found");
+		if (!Gate::allows('user_bookmark', $bookmark)) {
+			return $this->sendError(null, "Unauthorized access to bookmark", 403);
 		}
 		$bookmark->delete();
 		return $this->sendResponse([], "Bookmark deleted succesfully");

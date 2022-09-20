@@ -87,6 +87,8 @@ class FolderController extends BaseController
 		if ($validator->fails()) {
 			return $this->sendError("Validation Error.", $validator->errors());
 		}
+		
+
 		if (isset($input["name"])) {
 			$folder->name = $input["name"];
 		}
@@ -109,10 +111,6 @@ class FolderController extends BaseController
 	 */
 	public function destroy(Folder $folder)
 	{
-		// || $folder->id != Auth::user()->getAuthIdentifier()
-		if (is_null($folder)) {
-			$this->sendError("Folder not found");
-		}
 		$folder->delete();
 		return $this->sendResponse([], "Folder deleted succesfully");
 	}
