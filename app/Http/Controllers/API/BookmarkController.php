@@ -42,21 +42,24 @@ class BookmarkController extends BaseController
 	 */
 	public function store(Request $request)
 	{
-		//
+
 		$input = $request->all();
 		$regex = '/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/';
 
 		$validator = Validator::make($input, [
 			"title" => "required",
 			"url" => "required|url|regex:" . $regex,
-			"folder_id" => "integer"
 		]);
 
 		if ($validator->fails()) {
 			return $this->sendError("Validation Error.", $validator->errors());
 		}
 
-		$folder = Folder::findOrFail($input["folder_id"]);
+		if (!isset($input["folder_id"])) {
+			$folder = Folder::where('root_id', '=', null)->where('user_id', '=', Auth::user()->id)->get()->first();
+		} else {
+			$folder = Folder::findOrFail($input["folder_id"]);
+		}
 
 		if (!Gate::allows("user_folder", $folder)) {
 			return $this->sendError("Unauthorized access to folder", "Unauthorized access to folder", 403);
@@ -67,6 +70,7 @@ class BookmarkController extends BaseController
 				$bookmark->$key = $value;
 			}
 		}
+		$bookmark->folder()->associate($folder);
 		$bookmark->save();
 		return $this->sendResponse(
 			new BookmarkResource($bookmark),
@@ -111,11 +115,15 @@ class BookmarkController extends BaseController
 
 		$validator = Validator::make($input, [
 			"url" => "regex:" . $regex,
-			"folder_id" => "integer"
+			"folder_id" => "integer",
+			"id" => "integer"
 		]);
 
 		if ($validator->fails()) {
 			return $this->sendError("Validation Error.", $validator->errors());
+		}
+		if ($bookmark->id != $input["id"]) {
+			return $this->sendError(null, "Incorrect id", 403);
 		}
 
 		if (!isset($input["folder_id"])) {

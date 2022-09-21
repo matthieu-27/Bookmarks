@@ -8,18 +8,19 @@ use App\Models\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
 class FolderController extends BaseController
 {
 	/**
-	 * Display a listing of the resource.
+	 * Display a listing of the user resource.
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
 	public function index()
 	{
-		//
 		$folders = DB::table("folders")
 			->where("user_id", "=", Auth::user()->getAuthIdentifier())
 			->select("*")
@@ -35,18 +36,29 @@ class FolderController extends BaseController
 	 */
 	public function store(Request $request)
 	{
-		//
 		$input = $request->all();
+
 		$validator = Validator::make($input, [
 			"name" => "required",
 		]);
 		if ($validator->fails()) {
 			return $this->sendError("Validation Error.", $validator->errors());
 		}
-
 		$folder = new Folder();
-		$folder->name = $input["name"];
+		foreach ($input as $key => $value) {
+			if (isset($input[$key])) {
+				if (Schema::hasColumn('folders', $key)) {
+					$folder->$key = $value;
+				}
+			}
+		}
+		if ($folder->root_id === NULL) {
+			$folder->root_id = Folder::where('root_id', '=', null)->where('user_id', '=', Auth::user()->id)->get()->first()->id;
+		}
 		$folder->owner()->associate(Auth::user());
+		if (!Gate::allows('user_folder', $folder)) {
+			return $this->sendError(null, "Unauthorized access to parent folder", 403);
+		}
 		$folder->save();
 		return $this->sendResponse(
 			new FolderResource($folder),
@@ -62,7 +74,10 @@ class FolderController extends BaseController
 	 */
 	public function show(Folder $folder)
 	{
-		//
+		if (!Gate::allows('user_folder', $folder)) {
+			return $this->sendError(null, "Unauthorized access to folder", 403);
+		}
+
 		return $this->sendResponse(
 			new FolderResource($folder),
 			"Folder retrieved successfully."
@@ -82,19 +97,37 @@ class FolderController extends BaseController
 		$input = $request->all();
 
 		$validator = Validator::make($input, [
-			"name" => "required",
+			"name" => "string",
+			"root_id" => "integer",
+			"id" => "integer"
 		]);
+
 		if ($validator->fails()) {
 			return $this->sendError("Validation Error.", $validator->errors());
 		}
-		
 
-		if (isset($input["name"])) {
-			$folder->name = $input["name"];
+		if (!Gate::allows("user_folder", $folder)) {
+			return $this->sendError("Unauthorized access to folder", "Unauthorized access to folder", 403);
 		}
-		if (isset($input["root_id"])) {
-			$folder->root_id = $input["root_id"];
+
+
+
+		if ($folder->root_id === NULL && $input["root_id"] != NULL) {
+			return $this->sendError(null, "Can't change root_id of root folder !", 403);
 		}
+		if ($folder->id != $input["id"]) {
+			return $this->sendError(null, "Incorrect id", 403);
+		}
+
+
+		foreach ($input as $key => $value) {
+			if (isset($input[$key])) {
+				if (Schema::hasColumn("folders", $key)) {
+					$folder->$key = $value;
+				}
+			}
+		}
+
 
 		$folder->save();
 		return $this->sendResponse(
@@ -111,6 +144,9 @@ class FolderController extends BaseController
 	 */
 	public function destroy(Folder $folder)
 	{
+		if (!Gate::allows("user_folder", $folder)) {
+			return $this->sendError("Unauthorized access to folder", "Unauthorized access to folder", 403);
+		}
 		$folder->delete();
 		return $this->sendResponse([], "Folder deleted succesfully");
 	}
