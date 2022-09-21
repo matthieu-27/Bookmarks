@@ -97,9 +97,9 @@ class FolderController extends BaseController
 		$input = $request->all();
 
 		$validator = Validator::make($input, [
-			"name" => "string",
-			"root_id" => "integer",
-			"id" => "integer"
+			"name" => "string|nullable",
+			"root_id" => "integer|nullable",
+			"id" => "integer|nullable"
 		]);
 
 		if ($validator->fails()) {
@@ -111,17 +111,16 @@ class FolderController extends BaseController
 		}
 
 
+		if (isset($input["root_id"])) {
+			if ($folder->root_id === NULL && $input["root_id"] != NULL) {
+				return $this->sendError(null, "Can't change root_id of root folder !", 403);
+			}
+		}
 
-		if ($folder->root_id === NULL && $input["root_id"] != NULL) {
-			return $this->sendError(null, "Can't change root_id of root folder !", 403);
-		}
-		if ($folder->id != $input["id"]) {
-			return $this->sendError(null, "Incorrect id", 403);
-		}
 
 
 		foreach ($input as $key => $value) {
-			if (isset($input[$key])) {
+			if (isset($input[$key]) && $key != "id") {
 				if (Schema::hasColumn("folders", $key)) {
 					$folder->$key = $value;
 				}

@@ -114,22 +114,19 @@ class BookmarkController extends BaseController
 		$regex = '/^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/';
 
 		$validator = Validator::make($input, [
-			"url" => "regex:" . $regex,
-			"folder_id" => "integer",
-			"id" => "integer"
+			"url" => "nullable|regex:" . $regex,
+			"folder_id" => "integer|nullable",
+			"id" => "integer|nullable"
 		]);
 
 		if ($validator->fails()) {
 			return $this->sendError("Validation Error.", $validator->errors());
 		}
-		if ($bookmark->id != $input["id"]) {
-			return $this->sendError(null, "Incorrect id", 403);
-		}
 
 		if (!isset($input["folder_id"])) {
-			$folder = $bookmark->folder()->first();
+			$folder = $bookmark->folder()->get()->first();
 		} else {
-			if ($input["folder_id"] != $bookmark->folder()->first()->id) {
+			if ($input["folder_id"] != $bookmark->folder()->get()->first()->id) {
 				$folder = Folder::findOrFail($input["folder_id"]);
 			}
 		}
@@ -140,7 +137,7 @@ class BookmarkController extends BaseController
 
 
 		foreach ($input as $key => $value) {
-			if (isset($input[$key])) {
+			if (isset($input[$key]) && $key != "id") {
 				if (Schema::hasColumn("bookmarks", $key)) {
 					$bookmark->$key = $value;
 				}
