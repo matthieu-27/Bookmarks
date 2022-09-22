@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\BookmarkController;
 use App\Http\Controllers\API\FolderController;
 use App\Http\Controllers\API\RegisterController;
+use App\Http\Controllers\API\TagController;
 use App\Models\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
 Route::middleware("auth:sanctum")->get("/user", function (Request $request) {
 	return $request->user();
 });
@@ -29,6 +31,8 @@ Route::controller(RegisterController::class)->group(function () {
 Route::middleware("auth:sanctum")->group(function () {
 	Route::apiresource("folders", FolderController::class);
 	Route::apiresource("bookmarks", BookmarkController::class);
+	Route::apiresource("tags", TagController::class);
+
 	// Route::apiresource("folders.", BookmarkController::class);
 	// Route::get("test", function () {
 	// 	$f = Folder::findOrFail(2);

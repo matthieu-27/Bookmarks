@@ -45,4 +45,9 @@ class User extends Authenticatable
 		$folder->save();
 		return $model;
 	}
+
+	public function keywords()
+	{
+		return $this->hasManyThrough(Tag::class, Bookmark::class);
+	}
 }
