@@ -11,6 +11,12 @@ class Tag extends Model
 
     public function bookmarks()
     {
-        return $this->belongsToMany(Bookmark::class, 'bookmark_tag');
+        return $this->morphedByMany(Bookmark::class, 'taggable');
+    }
+
+    public function folders()
+
+    {
+        return $this->morphedByMany(Folder::class, 'taggable');
     }
 }

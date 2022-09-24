@@ -16,6 +16,6 @@ class Bookmark extends Model
 
 	public function tags()
 	{
-		return $this->belongsToMany(Tag::class, 'bookmark_tag');
+		return $this->morphToMany(Tag::class, 'taggable');
 	}
 }

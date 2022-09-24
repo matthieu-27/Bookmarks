@@ -13,9 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('bookmark_tags', function (Blueprint $table) {
-            $table->foreignId('bookmark_id')->constrained('bookmarks');
-            $table->foreignId('tag_id')->constrained('tags');
+        Schema::create('taggables', function (Blueprint $table) {
+            $table->integer("tag_id");
+            $table->integer("taggable_id");
+            $table->string("taggable_type");
         });
     }
 
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('bookmark_tags');
+        Schema::dropIfExists('taggables');
     }
 };
