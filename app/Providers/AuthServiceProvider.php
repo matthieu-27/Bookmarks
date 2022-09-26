@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Models\Bookmark;
 use App\Models\Folder;
+use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
@@ -36,6 +37,9 @@ class AuthServiceProvider extends ServiceProvider
         });
         Gate::define('user_bookmark', function (User $user, Bookmark $bookmark) {
             return $user->id === $bookmark->folder()->first()->user_id;
+        });
+        Gate::define('user_tag', function (User $user, Tag $tag) {
+            return $user->id === $tag->folders()->first()->user_id;
         });
     }
 }

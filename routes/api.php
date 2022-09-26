@@ -30,7 +30,9 @@ Route::controller(RegisterController::class)->group(function () {
 
 Route::middleware("auth:sanctum")->group(function () {
 	Route::apiresource("folders", FolderController::class);
+	Route::apiresource("folders.tags", TagController::class);
 	Route::apiresource("bookmarks", BookmarkController::class);
+	Route::apiresource("bookmarks.tags", TagController::class);
 	Route::apiresource("tags", TagController::class);
 
 	// Route::apiresource("folders.", BookmarkController::class);

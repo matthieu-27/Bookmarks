@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Bookmark;
+use App\Models\Folder;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Route;
 

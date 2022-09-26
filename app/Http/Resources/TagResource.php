@@ -16,7 +16,9 @@ class TagResource extends JsonResource
     {
         return [
             "id" => $this->id,
-            "tag" => $this->tag,
+            "name" => $this->name,
+            "folder" => $this->folders()->get(),
+            "bookmark" => $this->bookmarks()->get()
             // "root_id" => $this->root_id,
             // // "user_id" => $this->user_id,
             // // "childs" => FolderResource::collection($this->foldersin),
