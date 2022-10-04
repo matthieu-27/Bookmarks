@@ -9,6 +9,7 @@ use App\Models\Folder;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
@@ -31,7 +32,6 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
         Gate::define('user_folder', function (User $user, Folder $folder) {
             return $user->id === $folder->user_id;
         });
@@ -39,7 +39,7 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id === $bookmark->folder()->first()->user_id;
         });
         Gate::define('user_tag', function (User $user, Tag $tag) {
-            return $user->id === $tag->folders()->first()->user_id;
+            return $user->id === $tag->folders()->owner()->getRootFolder()->user_id;
         });
     }
 }

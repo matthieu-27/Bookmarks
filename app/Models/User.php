@@ -40,9 +40,19 @@ class User extends Authenticatable
 		$model = static::query()->create($attributes);
 
 		$folder = new Folder();
-		$folder->name = "/";
+		$folder->name = "root";
 		$folder->user_id = $model->id;
 		$folder->save();
 		return $model;
+	}
+
+	public function folders()
+	{
+		return $this->hasMany(Folder::class, 'user_id');
+	}
+
+	public function getRootFolder()
+	{
+		return $folder = Folder::where("root_id", "=", NULL)->where("user_id", "=", user()->id)->get();
 	}
 }

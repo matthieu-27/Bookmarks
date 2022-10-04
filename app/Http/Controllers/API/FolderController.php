@@ -22,8 +22,7 @@ class FolderController extends BaseController
 	public function index()
 	{
 		$folders = DB::table("folders")
-			->where("user_id", "=", Auth::user()->getAuthIdentifier())
-			->select("*")
+			->where("user_id", "=", Auth::user()->id)
 			->get();
 		return $this->sendResponse(FolderResource::collection($folders), "Success");
 	}

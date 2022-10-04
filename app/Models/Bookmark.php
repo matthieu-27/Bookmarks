@@ -9,6 +9,7 @@ class Bookmark extends Model
 {
 	use HasFactory;
 
+
 	public function folder()
 	{
 		return $this->belongsTo(Folder::class);
