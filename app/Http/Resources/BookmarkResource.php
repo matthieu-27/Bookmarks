@@ -21,9 +21,7 @@ class BookmarkResource extends JsonResource
 			"title" => $this->title,
 			"url" => $this->url,
 			"comment" => $this->comment,
-			"folder_id" => $this->folder_id,
-			// "user_id" => $this->user_id,
-			// "childs" => FolderResource::collection($this->foldersin),
+			"user_id" => $this->user_id,
 			"links" => [
 				"show" => route("bookmarks.show", $this->id),
 				"store" => route("bookmarks.store"),

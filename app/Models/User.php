@@ -45,14 +45,4 @@ class User extends Authenticatable
 		$folder->save();
 		return $model;
 	}
-
-	public function folders()
-	{
-		return $this->hasMany(Folder::class, 'user_id');
-	}
-
-	public function getRootFolder()
-	{
-		return $folder = Folder::where("root_id", "=", NULL)->where("user_id", "=", user()->id)->get();
-	}
 }

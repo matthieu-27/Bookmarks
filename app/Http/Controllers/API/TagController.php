@@ -9,6 +9,7 @@ use App\Models\Folder;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
@@ -18,9 +19,8 @@ class TagController extends BaseController
 
     public function index()
     {
-        $tags = user()->folders()->get();
 
-        dd($tags);
+        $tags = Tag::byUser()->orderBy('created_at')->get();
 
         return $this->sendResponse(
             TagResource::collection($tags),

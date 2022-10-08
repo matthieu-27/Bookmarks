@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\FolderResource;
+use App\Models\Bookmark;
 use App\Models\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,13 +18,11 @@ class FolderController extends BaseController
 	/**
 	 * Display a listing of the user resource.
 	 *
-	 * @return \Illuminate\Http\Response
+	 * @return mixed
 	 */
 	public function index()
 	{
-		$folders = DB::table("folders")
-			->where("user_id", "=", Auth::user()->id)
-			->get();
+		$folders = Folder::byUser()->orderBy('created_at')->get();
 		return $this->sendResponse(FolderResource::collection($folders), "Success");
 	}
 
@@ -39,6 +38,7 @@ class FolderController extends BaseController
 
 		$validator = Validator::make($input, [
 			"name" => "required",
+			"user_id" => "integer",
 		]);
 		if ($validator->fails()) {
 			return $this->sendError("Validation Error.", $validator->errors());
@@ -51,10 +51,8 @@ class FolderController extends BaseController
 				}
 			}
 		}
-		if ($folder->root_id === NULL) {
-			$folder->root_id = Folder::where('root_id', '=', null)->where('user_id', '=', Auth::user()->id)->get()->first()->id;
-		}
-		$folder->owner()->associate(Auth::user());
+
+		$folder->user()->associate(Auth::user());
 		if (!Gate::allows('user_folder', $folder)) {
 			return $this->sendError(null, "Unauthorized access to parent folder", 403);
 		}
@@ -97,7 +95,6 @@ class FolderController extends BaseController
 
 		$validator = Validator::make($input, [
 			"name" => "string|nullable",
-			"root_id" => "integer|nullable",
 			"id" => "integer|nullable"
 		]);
 
@@ -116,8 +113,6 @@ class FolderController extends BaseController
 			}
 		}
 
-
-
 		foreach ($input as $key => $value) {
 			if (isset($input[$key]) && $key != "id") {
 				if (Schema::hasColumn("folders", $key)) {
@@ -126,8 +121,8 @@ class FolderController extends BaseController
 			}
 		}
 
-
 		$folder->save();
+
 		return $this->sendResponse(
 			new FolderResource($folder),
 			"Folder updated successfully."
@@ -145,6 +140,11 @@ class FolderController extends BaseController
 		if (!Gate::allows("user_folder", $folder)) {
 			return $this->sendError("Unauthorized access to folder", "Unauthorized access to folder", 403);
 		}
+		$bookmarks = $folder->bookmarks()->get();
+		foreach ($bookmarks as $bookmark) {
+			$bookmark->delete();
+		}
+		$folder->bookmarks()->detach();
 		$folder->delete();
 		return $this->sendResponse([], "Folder deleted succesfully");
 	}

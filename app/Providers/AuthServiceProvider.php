@@ -36,10 +36,10 @@ class AuthServiceProvider extends ServiceProvider
             return $user->id === $folder->user_id;
         });
         Gate::define('user_bookmark', function (User $user, Bookmark $bookmark) {
-            return $user->id === $bookmark->folder()->first()->user_id;
+            return $user->id === $bookmark->user_id;
         });
         Gate::define('user_tag', function (User $user, Tag $tag) {
-            return $user->id === $tag->folders()->owner()->getRootFolder()->user_id;
+            return $user->id === $tag->user_id;
         });
     }
 }
