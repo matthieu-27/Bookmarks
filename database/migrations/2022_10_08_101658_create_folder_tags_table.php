@@ -13,11 +13,11 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tags', function (Blueprint $table) {
-            $table->id();
-            $table->integer('user_id')->unsigned();
-            $table->text("name");
-            $table->timestamps();
+        Schema::create('folder_tags', function (Blueprint $table) {
+            $table->integer('folder_id')->unsigned();
+            $table->integer('tag_id')->unsigned();
+
+            $table->primary(['folder_id', 'tag_id']);
         });
     }
 
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tags');
+        Schema::dropIfExists('folder_tags');
     }
 };

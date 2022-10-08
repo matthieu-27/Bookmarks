@@ -19,9 +19,7 @@ class FolderResource extends JsonResource
 			"created_at" => $this->created_at,
 			"updated_at" => $this->updated_at,
 			"name" => $this->name,
-			"root_id" => $this->root_id,
-			// "user_id" => $this->user_id,
-			// "childs" => FolderResource::collection($this->foldersin),
+			"user_id" => $this->user_id,
 			"links" => [
 				"show" => route("folders.show", $this->id),
 				"store" => route("folders.store"),

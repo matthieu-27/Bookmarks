@@ -13,11 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tags', function (Blueprint $table) {
-            $table->id();
-            $table->integer('user_id')->unsigned();
-            $table->text("name");
-            $table->timestamps();
+        Schema::create('folder_bookmarks', function (Blueprint $table) {
+            $table->integer('bookmark_id')->unsigned();
+            $table->integer('folder_id')->unsigned();
         });
     }
 
@@ -28,6 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tags');
+        Schema::dropIfExists('folder_bookmarks');
     }
 };

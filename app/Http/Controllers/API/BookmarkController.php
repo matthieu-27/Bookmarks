@@ -23,11 +23,7 @@ class BookmarkController extends BaseController
 	public function index()
 	{
 		//
-		$bookmarks = DB::table("bookmarks")
-			->join("folders", "bookmarks.folder_id", "=", "folders.id")
-			->where("user_id", "=", Auth::user()->getAuthIdentifier())
-			->select("bookmarks.*")
-			->get();
+		$bookmarks = Bookmark::byUser()->orderBy('created_at')->get();
 		return $this->sendResponse(
 			BookmarkResource::collection($bookmarks),
 			"Success"
@@ -49,29 +45,35 @@ class BookmarkController extends BaseController
 		$validator = Validator::make($input, [
 			"title" => "required",
 			"url" => "required|url|regex:" . $regex,
+			"user_id" => "integer",
+			"folder_id" => "integer|nullable"
 		]);
 
 		if ($validator->fails()) {
 			return $this->sendError("Validation Error.", $validator->errors());
 		}
 
-		if (!isset($input["folder_id"])) {
-			$folder = Folder::where('root_id', '=', null)->where('user_id', '=', Auth::user()->id)->get()->first();
-		} else {
-			$folder = Folder::findOrFail($input["folder_id"]);
-		}
-
-		if (!Gate::allows("user_folder", $folder)) {
-			return $this->sendError("Unauthorized access to folder", "Unauthorized access to folder", 403);
-		}
 		$bookmark = new Bookmark();
 		foreach ($input as $key => $value) {
 			if (Schema::hasColumn("bookmarks", $key)) {
 				$bookmark->$key = $value;
 			}
 		}
-		$bookmark->folder()->associate($folder);
+
+		$bookmark->user()->associate(Auth::user());
+
+		if (!is_null($input["folder_id"])) {
+			$folder = Folder::findOrFail($input["folder_id"]);
+		} else {
+			$folder = Folder::where("user_id", "=", Auth::user()->id)->first();
+		}
+
+		if (!Gate::allows('user_folder', $folder) || !Gate::allows('user_bookmark', $bookmark)) {
+			return $this->sendError(null, "Unauthorized access to ressource", 403);
+		}
+
 		$bookmark->save();
+		$bookmark->folders()->sync($folder);
 		return $this->sendResponse(
 			new BookmarkResource($bookmark),
 			"Bookmark created successfully."
@@ -123,28 +125,28 @@ class BookmarkController extends BaseController
 			return $this->sendError("Validation Error.", $validator->errors());
 		}
 
-		if (!isset($input["folder_id"])) {
-			$folder = $bookmark->folder()->get()->first();
+		if (is_null($input["folder_id"])) {
+			$folder = $bookmark->folders()->first();
 		} else {
-			if ($input["folder_id"] != $bookmark->folder()->get()->first()->id) {
-				$folder = Folder::findOrFail($input["folder_id"]);
-			}
+			$folder = Folder::findOrFail($input["folder_id"]);
 		}
 
 		if (!Gate::allows("user_folder", $folder)) {
 			return $this->sendError("Unauthorized access to folder", "Unauthorized access to folder", 403);
 		}
 
-
 		foreach ($input as $key => $value) {
-			if (isset($input[$key]) && $key != "id") {
+			if (!is_null($input[$key]) && $key != "id") {
 				if (Schema::hasColumn("bookmarks", $key)) {
 					$bookmark->$key = $value;
 				}
 			}
 		}
 
+
+		$bookmark->folders()->sync($folder);
 		$bookmark->save();
+
 		return $this->sendResponse(
 			new BookmarkResource($bookmark),
 			"Bookmark updated successfully."
@@ -162,6 +164,7 @@ class BookmarkController extends BaseController
 		if (!Gate::allows('user_bookmark', $bookmark)) {
 			return $this->sendError(null, "Unauthorized access to bookmark", 403);
 		}
+		$bookmark->folders()->detach();
 		$bookmark->delete();
 		return $this->sendResponse([], "Bookmark deleted succesfully");
 	}

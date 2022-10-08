@@ -4,19 +4,41 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Builder;
 
 class Tag extends Model
 {
     use HasFactory;
-
-    public function bookmarks()
+    /**
+     * Scope for the user relation
+     *
+     * @param Builder  $query
+     * @param int|null $user_id
+     * @return Builder
+     */
+    public function scopeByUser(Builder $query, int $user_id = null): Builder
     {
-        return $this->morphedByMany(Bookmark::class, 'taggable');
+        if (is_null($user_id) && auth()->check()) {
+            $user_id = auth()->id();
+        }
+        return $query->where('user_id', $user_id);
     }
 
-    public function folders()
-
+    /**
+     * @return BelongsToMany
+     */
+    public function bookmarks(): BelongsToMany
     {
-        return $this->morphedByMany(Folder::class, 'taggable');
+        return $this->belongsToMany('App\Models\Bookmark', 'bookmark_tags', 'tag_id', 'bookmark_id');
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 }
