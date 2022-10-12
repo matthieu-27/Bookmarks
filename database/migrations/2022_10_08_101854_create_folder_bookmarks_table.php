@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('folder_bookmarks', function (Blueprint $table) {
             $table->integer('bookmark_id')->unsigned();
             $table->integer('folder_id')->unsigned();
+            $table->primary(['bookmark_id', 'folder_id']);
         });
     }
 

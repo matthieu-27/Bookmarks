@@ -31,7 +31,7 @@ class Tag extends Model
      */
     public function bookmarks(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Bookmark', 'bookmark_tags', 'tag_id', 'bookmark_id');
+        return $this->belongsToMany(Bookmark::class, 'bookmark_tags', 'tag_id', 'bookmark_id');
     }
 
     /**
@@ -39,6 +39,6 @@ class Tag extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User', 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

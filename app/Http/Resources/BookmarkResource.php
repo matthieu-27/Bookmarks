@@ -20,8 +20,9 @@ class BookmarkResource extends JsonResource
 			"updated_at" => $this->updated_at,
 			"title" => $this->title,
 			"url" => $this->url,
-			"comment" => $this->comment,
+			"description" => $this->description,
 			"user_id" => $this->user_id,
+			"thumbnail" => $this->thumbnail,
 			"links" => [
 				"show" => route("bookmarks.show", $this->id),
 				"store" => route("bookmarks.store"),

@@ -20,7 +20,7 @@ class TagController extends BaseController
     public function index()
     {
 
-        $tags = Tag::byUser()->orderBy('created_at')->get();
+        $tags = Tag::byUser()->get();
 
         return $this->sendResponse(
             TagResource::collection($tags),
@@ -75,9 +75,6 @@ class TagController extends BaseController
                     new TagResource($tag),
                     "Tag created successfully."
                 );
-            } else {
-                /* this block is executed if both variables folder_id and bookmark_id are given */
-                return $this->sendError(null, "Please indicate only one id.");
             }
         }
     }

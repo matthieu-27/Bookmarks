@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\BookmarkResource;
 use App\Models\Bookmark;
 use App\Models\Folder;
+use App\Models\Tag;
+use GuzzleHttp\Psr7\Query;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -144,8 +146,8 @@ class BookmarkController extends BaseController
 		}
 
 
-		$bookmark->folders()->sync($folder);
 		$bookmark->save();
+		$bookmark->folders()->sync($folder);
 
 		return $this->sendResponse(
 			new BookmarkResource($bookmark),
