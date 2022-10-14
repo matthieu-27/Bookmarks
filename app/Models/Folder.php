@@ -42,4 +42,9 @@ class Folder extends Model
 	{
 		return $this->belongsTo(User::class, 'user_id');
 	}
+
+	public function tags(): BelongsToMany
+	{
+		return $this->belongsToMany(Tag::class, 'folder_tags', 'folder_id', 'tag_id');
+	}
 }
