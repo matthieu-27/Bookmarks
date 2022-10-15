@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserController;
 use App\Models\Bookmark;
 use App\Models\Folder;
 use App\Models\Tag;
@@ -19,3 +20,7 @@ use Illuminate\Support\Facades\Route;
 Route::get("/", function () {
 	return view("home");
 })->middleware("auth");
+
+Route::get('admin', [UserController::class, 'checkAdmin'])->middleware('auth')->name("admin.index");
+Route::post('admin', [UserController::class, 'delete'])->middleware('auth');
+Route::delete('admin/{id}', [UserController::class, 'delete'])->middleware('auth')->name("user.destroy");
