@@ -4,8 +4,12 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BookmarkResource;
+use App\Http\Resources\FolderResource;
+use App\Http\Resources\TagResource;
 use App\Models\Bookmark;
+use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 
 class SearchController extends BaseController
@@ -14,7 +18,6 @@ class SearchController extends BaseController
      * Search user's bookmarks with title / description
      *
      * @param Request $request
-     * @return mixed
      */
     public function searchBookmarks(Request $request)
     {
@@ -43,6 +46,20 @@ class SearchController extends BaseController
 
         $search = $search->get();
 
-        return $this->sendResponse(BookmarkResource::collection($search), "Bookmarks Found");
+        return $this->sendResponse(BookmarkResource::collection($search), "Bookmarks found.");
+    }
+
+    /**
+     * Search user's tags with name
+     *
+     * @param Request $request
+     */
+    public function searchTags(Request $request)
+    {
+        $query = $request->input('query', false);
+
+        $tags = Tag::byUser($request->user()->id)->where('name', 'like', '%' . $query . '%')->with("folders")->with("bookmarks")->get();
+
+        return $this->sendResponse(TagResource::collection($tags), "Tags found.");
     }
 }

@@ -38,7 +38,8 @@ Route::middleware("auth:sanctum")->group(function () {
 	Route::apiresource("tags", TagController::class);
 	Route::post('search/bookmarks/', [SearchController::class, 'searchBookmarks'])
 		->name('api.search.bookmarks');
-
+	Route::post('search/tags/', [SearchController::class, 'searchTags'])
+		->name('api.search.tags');
 	// Route::apiresource("folders.", BookmarkController::class);
 	// Route::get("test", function () {
 	// 	$f = Folder::findOrFail(2);

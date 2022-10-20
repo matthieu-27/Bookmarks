@@ -32,7 +32,7 @@ class Folder extends Model
 	 */
 	public function bookmarks(): BelongsToMany
 	{
-		return $this->belongsToMany(Bookmark::class, 'folder_bookmarks', 'folder_id', 'bookmark_id');
+		return $this->belongsToMany(Bookmark::class, 'folder_bookmarks', 'bookmark_id', 'folder_id');
 	}
 
 	/**

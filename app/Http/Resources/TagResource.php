@@ -25,6 +25,8 @@ class TagResource extends JsonResource
                 "udpate" => route("tags.update", $this->id),
                 "destroy" => route("tags.destroy", $this->id),
             ],
+            "folders" => $this->folders,
+            "bookmarks" => $this->bookmarks,
         ];
     }
 }

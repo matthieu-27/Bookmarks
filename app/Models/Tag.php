@@ -25,15 +25,20 @@ class Tag extends Model
         }
         return $query->where('user_id', $user_id);
     }
-
     /**
      * @return BelongsToMany
      */
     public function bookmarks(): BelongsToMany
     {
-        return $this->belongsToMany(Bookmark::class, 'bookmark_tags', 'tag_id', 'bookmark_id');
+        return $this->belongsToMany(Bookmark::class, 'bookmark_tags', 'bookmark_id', 'tag_id');
     }
-
+    /**
+     * @return BelongsToMany
+     */
+    public function folders(): BelongsToMany
+    {
+        return $this->belongsToMany(Folder::class, 'folder_tags', 'folder_id', 'tag_id');
+    }
     /**
      * @return BelongsTo
      */
