@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Builder;
 class Tag extends Model
 {
     use HasFactory;
+    protected $hidden = ['pivot'];
+    public $timestamps = false;
     /**
      * Scope for the user relation
      *
@@ -30,20 +32,20 @@ class Tag extends Model
      */
     public function bookmarks(): BelongsToMany
     {
-        return $this->belongsToMany(Bookmark::class, 'bookmark_tags', 'bookmark_id', 'tag_id');
+        return $this->belongsToMany('App\Models\Bookmark', 'bookmark_tags', 'tag_id', 'bookmark_id');
     }
     /**
      * @return BelongsToMany
      */
     public function folders(): BelongsToMany
     {
-        return $this->belongsToMany(Folder::class, 'folder_tags', 'folder_id', 'tag_id');
+        return $this->belongsToMany('App\Models\Folder', 'folder_tags', 'tag_id', 'folder_id');
     }
     /**
      * @return BelongsTo
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo('App\Models\User', 'user_id');
     }
 }

@@ -15,13 +15,13 @@ class BookmarkResource extends JsonResource
 	public function toArray($request)
 	{
 		return [
-			"id" => $this->id,
-			"created_at" => $this->created_at,
-			"updated_at" => $this->updated_at,
+			// "id" => $this->id,
+			// "created_at" => $this->created_at,
+			// "updated_at" => $this->updated_at,
 			"title" => $this->title,
 			"url" => $this->url,
 			"description" => $this->description,
-			"user_id" => $this->user_id,
+			// "user_id" => $this->user_id,
 			"thumbnail" => $this->thumbnail,
 			"links" => [
 				"show" => route("bookmarks.show", $this->id),

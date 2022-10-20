@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Builder;
 class Folder extends Model
 {
 	use HasFactory;
-
+	protected $hidden = ['pivot'];
+	public $timestamps = false;
 	/**
 	 * Scope for the user relation
 	 *

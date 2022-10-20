@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Bookmark extends Model
 {
 	use HasFactory;
-
+	protected $hidden = ['pivot'];
+	public $timestamps = false;
 	/**
 	 * Scope for the user relation
 	 *

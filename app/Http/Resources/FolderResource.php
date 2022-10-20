@@ -15,11 +15,11 @@ class FolderResource extends JsonResource
 	public function toArray($request)
 	{
 		return [
-			"id" => $this->id,
-			"created_at" => $this->created_at,
-			"updated_at" => $this->updated_at,
+			// "id" => $this->id,
+			// "created_at" => $this->created_at,
+			// "updated_at" => $this->updated_at,
 			"name" => $this->name,
-			"user_id" => $this->user_id,
+			// "user_id" => $this->user_id,
 			"links" => [
 				"show" => route("folders.show", $this->id),
 				"store" => route("folders.store"),
