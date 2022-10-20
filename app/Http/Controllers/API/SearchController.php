@@ -46,7 +46,7 @@ class SearchController extends BaseController
 
         $search = $search->get();
 
-        return $this->sendResponse(BookmarkResource::collection($search), "Bookmarks found.");
+        return $this->sendResponse(new BookmarkResource($search), "Bookmarks found.");
     }
 
     /**
@@ -60,6 +60,6 @@ class SearchController extends BaseController
 
         $tags = Tag::byUser($request->user()->id)->where('name', 'like', '%' . $query . '%')->with(["folders", "bookmarks"])->get();
 
-        return $this->sendResponse(TagResource::collection($tags), "Tags found.");
+        return $this->sendResponse(new TagResource($tags), "Tags found.");
     }
 }

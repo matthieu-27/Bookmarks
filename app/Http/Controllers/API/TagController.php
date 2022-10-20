@@ -180,7 +180,6 @@ class TagController extends BaseController
         $tag = new Tag();
         $tag->name = $name;
         $model->tags()->attach($tag);
-
         return $tag;
     }
     /**
@@ -188,13 +187,13 @@ class TagController extends BaseController
      *
      * @param mixed $model
      * @param string $name
+     * @param int $id
      * @return \App\Models\Tag
      */
     private function syncTag($model, $input, $id)
     {
         $tag = Tag::findOrFail($id);
         $model->tags()->detach($tag);
-
         foreach ($input as $key => $value) {
             if (!is_null($input[$key]) && $key != "id") {
                 if (Schema::hasColumn("tags", $key)) {
@@ -203,9 +202,7 @@ class TagController extends BaseController
             }
         }
         $tag->save();
-
         $model->tags()->attach($tag);
-
         return $tag;
     }
 }

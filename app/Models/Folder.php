@@ -2,17 +2,34 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * Class Folder
+ *
+ * @package App\Models
+ * @property int                    $id
+ * @property int                    $user_id
+ * @property string                 $name
+ * @property string|null			$description
+ * @property Carbon|null         	$created_at
+ * @property Carbon|null           	$updated_at
+ * @property Collection|Bookmark[]  $folders
+ * @property Collection|Tag[]      	$tags
+ * @method static Builder|Folder byUser(int $user_id = null)
+ */
 class Folder extends Model
 {
 	use HasFactory;
 	protected $hidden = ['pivot'];
 	public $timestamps = false;
+
 	/**
 	 * Scope for the user relation
 	 *
@@ -27,6 +44,11 @@ class Folder extends Model
 		}
 		return $query->where('user_id', $user_id);
 	}
+
+	/*
+     | ========================================================================
+     | RELATIONSHIPS
+     */
 
 	/**
 	 * @return BelongsToMany
@@ -44,6 +66,9 @@ class Folder extends Model
 		return $this->belongsTo(User::class, 'user_id');
 	}
 
+	/**
+	 * @return BelongsToMany
+	 */
 	public function tags(): BelongsToMany
 	{
 		return $this->belongsToMany(Tag::class, 'folder_tags', 'folder_id', 'tag_id');

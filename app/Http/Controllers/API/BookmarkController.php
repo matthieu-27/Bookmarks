@@ -25,7 +25,7 @@ class BookmarkController extends BaseController
 	public function index()
 	{
 		//
-		$bookmarks = Bookmark::byUser()->orderBy('created_at')->get();
+		$bookmarks = Bookmark::byUser()->get();
 		return $this->sendResponse(
 			BookmarkResource::collection($bookmarks),
 			"Success"
@@ -74,8 +74,10 @@ class BookmarkController extends BaseController
 			return $this->sendError(null, "Unauthorized access to ressource", 403);
 		}
 
+		$bookmark->folders()->detach($folder);
 		$bookmark->save();
-		$bookmark->folders()->sync($folder);
+		$bookmark->folders()->attach($folder);
+
 		return $this->sendResponse(
 			new BookmarkResource($bookmark),
 			"Bookmark created successfully."
@@ -145,9 +147,9 @@ class BookmarkController extends BaseController
 			}
 		}
 
-
+		$bookmark->folders()->detach($folder);
 		$bookmark->save();
-		$bookmark->folders()->sync($folder);
+		$bookmark->folders()->attach($folder);
 
 		return $this->sendResponse(
 			new BookmarkResource($bookmark),
@@ -167,6 +169,7 @@ class BookmarkController extends BaseController
 			return $this->sendError(null, "Unauthorized access to bookmark", 403);
 		}
 		$bookmark->folders()->detach();
+		$bookmark->tags()->detach();
 		$bookmark->delete();
 		return $this->sendResponse([], "Bookmark deleted succesfully");
 	}

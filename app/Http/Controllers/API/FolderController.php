@@ -22,7 +22,7 @@ class FolderController extends BaseController
 	 */
 	public function index()
 	{
-		$folders = Folder::byUser()->orderBy('created_at')->get();
+		$folders = Folder::byUser()->get();
 		return $this->sendResponse(FolderResource::collection($folders), "Success");
 	}
 
@@ -38,7 +38,6 @@ class FolderController extends BaseController
 
 		$validator = Validator::make($input, [
 			"name" => "required",
-			"user_id" => "integer",
 		]);
 		if ($validator->fails()) {
 			return $this->sendError("Validation Error.", $validator->errors());
@@ -145,6 +144,7 @@ class FolderController extends BaseController
 			$bookmark->delete();
 		}
 		$folder->bookmarks()->detach();
+		$folder->tags()->detach();
 		$folder->delete();
 		return $this->sendResponse([], "Folder deleted succesfully");
 	}
