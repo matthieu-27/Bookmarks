@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 
 class TagController extends BaseController
@@ -60,12 +61,13 @@ class TagController extends BaseController
                 if (!Gate::allows("user_folder", $ressource)) {
                     return $this->sendError(null, "Unauthorized access to folder", 403);
                 }
-            }
-            if (!isset($input["folder_id"]) && isset($input["bookmark_id"])) {
+            } elseif (!isset($input["folder_id"]) && isset($input["bookmark_id"])) {
                 $ressource = Bookmark::find($input["bookmark_id"]);
                 if (!Gate::allows('user_bookmark', $ressource)) {
                     return $this->sendError(null, "Unauthorized access to bookmark", 403);
                 }
+            } else {
+                return $this->sendError(null, "You can't enter both a folder_id and a bookmark_id");
             }
             /* if the $ressource is not null: creation of the tag */
             if (isset($ressource)) {
@@ -105,9 +107,49 @@ class TagController extends BaseController
      */
     public function update(Request $request, Tag $tag)
     {
-        //
         $input = $request->all();
-        dd($input, $tag);
+
+        if (!Gate::allows('user_tag', $tag)) {
+            return $this->sendError(null, "Unauthorized access to tag", 403);
+        }
+
+        $validator = Validator::make($input, [
+            "name" => "required",
+            "folder_id" => "integer|nullable",
+            "bookmark_id" => "integer|nullable"
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError("Validation Error.", $validator->errors());
+        }
+
+        if (!isset($input["folder_id"]) && !isset($input["bookmark_id"])) {
+            return $this->sendError(null, "Please indicate at least one id.");
+        } else {
+            if (isset($input["folder_id"]) && !isset($input["bookmark_id"])) {
+                $ressource = Folder::find($input["folder_id"]);
+                if (!Gate::allows("user_folder", $ressource)) {
+                    return $this->sendError(null, "Unauthorized access to folder", 403);
+                }
+            } elseif (!isset($input["folder_id"]) && isset($input["bookmark_id"])) {
+                $ressource = Bookmark::find($input["bookmark_id"]);
+                if (!Gate::allows('user_bookmark', $ressource)) {
+                    return $this->sendError(null, "Unauthorized access to bookmark", 403);
+                }
+            } else {
+                return $this->sendError(null, "You can't enter both a folder_id and a bookmark_id");
+            }
+        }
+        /* if the $ressource is not null: call syncTag() with the tag id */
+        if (isset($ressource)) {
+            $tag = $this->syncTag($ressource, $input, $tag->id);
+            return $this->sendResponse(
+                new TagResource($tag),
+                "Tag updated successfully."
+            );
+        } else {
+            $this->sendError(null, "Problem during Update");
+        }
     }
 
     /**
@@ -118,14 +160,51 @@ class TagController extends BaseController
      */
     public function destroy(Tag $tag)
     {
-        //
+        if (!Gate::allows('user_tag', $tag)) {
+            return $this->sendError(null, "Unauthorized access to bookmark", 403);
+        }
+        $tag->folders()->detach();
+        $tag->bookmarks()->detach();
+        $tag->delete();
+        return $this->sendResponse([], "Tag deleted succesfully");
     }
-
+    /**
+     * Create a Tag and assign it to the given Model
+     *
+     * @param mixed $model
+     * @param string $name
+     * @return \App\Models\Tag
+     */
     private function makeTag($model, $name)
     {
         $tag = new Tag();
         $tag->name = $name;
-        $model->tags()->save($tag);
+        $model->tags()->attach($tag);
+
+        return $tag;
+    }
+    /**
+     * Update a Tag and sync it to the given Model
+     *
+     * @param mixed $model
+     * @param string $name
+     * @return \App\Models\Tag
+     */
+    private function syncTag($model, $input, $id)
+    {
+        $tag = Tag::findOrFail($id);
+        $model->tags()->detach($tag);
+
+        foreach ($input as $key => $value) {
+            if (!is_null($input[$key]) && $key != "id") {
+                if (Schema::hasColumn("tags", $key)) {
+                    $tag->$key = $value;
+                }
+            }
+        }
+        $tag->save();
+
+        $model->tags()->attach($tag);
 
         return $tag;
     }
