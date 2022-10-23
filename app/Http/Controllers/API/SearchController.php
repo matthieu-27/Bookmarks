@@ -58,7 +58,7 @@ class SearchController extends BaseController
     {
         $query = $request->input('query', false);
 
-        $tags = Tag::byUser($request->user()->id)->where('name', 'like', '%' . $query . '%')->with(["folders", "bookmarks"])->get();
+        $tags = Tag::byUser($request->user()->id)->where('name', 'like', '%' . $query . '%')->with(["folders", "bookmarks"])->first();
 
         return $this->sendResponse(new TagResource($tags), "Tags found.");
     }

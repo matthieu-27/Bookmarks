@@ -17,13 +17,11 @@ class TagResource extends JsonResource
      */
     public function toArray($request)
     {
-        if (!is_null($this->folders)) $folders = FolderResource::collection($this->folders);
-        if (!is_null($this->bookmarks)) $bookmarks = BookmarkResource::collection($this->bookmarks);
+        $folders = FolderResource::collection($this->folders);
+        $bookmarks = BookmarkResource::collection($this->bookmarks);
 
         return [
-            // "id" => $this->id,
             "name" => $this->name,
-            // "user_id" => $this->user_id,
             "links" => [
                 "show" => route("tags.show", $this->id),
                 "store" => route("tags.store"),
