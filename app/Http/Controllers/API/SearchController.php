@@ -56,10 +56,33 @@ class SearchController extends BaseController
      */
     public function searchTags(Request $request)
     {
-        $query = $request->input('query', false);
+        // $query = $request->input('query', false);
 
-        $tags = Tag::byUser($request->user()->id)->where('name', 'like', '%' . $query . '%')->with(["folders", "bookmarks"])->first();
+        // $tags = Tag::byUser()->where('name', 'like', '%' . $query . '%')->with(["folders", "bookmarks"])->get();
+        $input = $request->all();
 
-        return $this->sendResponse(new TagResource($tags), "Tags found.");
+        $validator = Validator::make($input, [
+            "name" => "max:255",
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError("Validation Error.", $validator->errors());
+        }
+
+
+        $search = Tag::byUser();
+
+        if (isset($input["name"])) {
+            $search->where("name", "like", '%' . $input["name"] . '%')->with("folders")->with("bookmarks");
+        }
+
+
+        $search = $search->first();
+
+        if (isset($search)) {
+            return $this->sendResponse(new TagResource($search), "Tags found.");
+        } else {
+            return $this->sendError(null, "Nothing found.");
+        }
     }
 }

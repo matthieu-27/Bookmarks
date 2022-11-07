@@ -21,10 +21,10 @@ class UserController extends Controller
     {
         $users = User::all();
 
-        if (Auth::user()->is_admin) {
-            return view("admin/index")->with("users", $users);
+        if (auth()->user()->is_admin) {
+            return view("admin.index")->with("users", $users);
         } else {
-            return view("home");
+            redirect("home");
         }
     }
 

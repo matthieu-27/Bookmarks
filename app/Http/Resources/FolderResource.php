@@ -14,7 +14,9 @@ class FolderResource extends JsonResource
 	 */
 	public function toArray($request)
 	{
+		$bookmarks = BookmarkResource::collection($this->bookmarks);
 		return [
+			"id" => $this->id,
 			"name" => $this->name,
 			"links" => [
 				"show" => route("folders.show", $this->id),
@@ -22,6 +24,7 @@ class FolderResource extends JsonResource
 				"udpate" => route("folders.update", $this->id),
 				"destroy" => route("folders.destroy", $this->id),
 			],
+			"bookmarks" => $bookmarks,
 		];
 	}
 }

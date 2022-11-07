@@ -39,23 +39,27 @@ class FolderController extends BaseController
 		$validator = Validator::make($input, [
 			"name" => "required",
 		]);
+
 		if ($validator->fails()) {
 			return $this->sendError("Validation Error.", $validator->errors());
 		}
 		$folder = new Folder();
+		$folder->user_id = auth()->user()->id;
+
+
 		foreach ($input as $key => $value) {
 			if (isset($input[$key])) {
-				if (Schema::hasColumn('folders', $key)) {
+				if (Schema::hasColumn('folders', $key) && $key != "id" && $key != "user_id") {
 					$folder->$key = $value;
 				}
 			}
 		}
 
-		$folder->user()->associate(Auth::user());
+		$folder->save();
+
 		if (!Gate::allows('user_folder', $folder)) {
 			return $this->sendError(null, "Unauthorized access to parent folder", 403);
 		}
-		$folder->save();
 		return $this->sendResponse(
 			new FolderResource($folder),
 			"Folder created successfully."
@@ -93,8 +97,7 @@ class FolderController extends BaseController
 		$input = $request->all();
 
 		$validator = Validator::make($input, [
-			"name" => "string|nullable",
-			"id" => "integer|nullable"
+			"name" => "string",
 		]);
 
 		if ($validator->fails()) {
@@ -106,14 +109,8 @@ class FolderController extends BaseController
 		}
 
 
-		if (isset($input["root_id"])) {
-			if ($folder->root_id === NULL && $input["root_id"] != NULL) {
-				return $this->sendError(null, "Can't change root_id of root folder !", 403);
-			}
-		}
-
 		foreach ($input as $key => $value) {
-			if (isset($input[$key]) && $key != "id") {
+			if (isset($input[$key]) && $key != "id" && $key != "user_id") {
 				if (Schema::hasColumn("folders", $key)) {
 					$folder->$key = $value;
 				}

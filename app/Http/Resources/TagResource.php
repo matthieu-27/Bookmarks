@@ -21,6 +21,7 @@ class TagResource extends JsonResource
         $bookmarks = BookmarkResource::collection($this->bookmarks);
 
         return [
+            "id" => $this->id,
             "name" => $this->name,
             "links" => [
                 "show" => route("tags.show", $this->id),

@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use App\Http\Resources\TagResource;
 use App\Models\Bookmark;
 use App\Models\Folder;
 use App\Models\Tag;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
@@ -20,7 +17,6 @@ class TagController extends BaseController
 
     public function index()
     {
-
         $tags = Tag::byUser()->get();
 
         return $this->sendResponse(
@@ -41,10 +37,11 @@ class TagController extends BaseController
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            "name" => "required",
+            "name" => "required|unique:tags",
             "folder_id" => "integer|nullable",
             "bookmark_id" => "integer|nullable"
         ]);
+
         if ($validator->fails()) {
             return $this->sendError("Validation Error.", $validator->errors());
         }
@@ -114,7 +111,7 @@ class TagController extends BaseController
         }
 
         $validator = Validator::make($input, [
-            "name" => "required",
+            "name" => "required|unique:tags",
             "folder_id" => "integer|nullable",
             "bookmark_id" => "integer|nullable"
         ]);
@@ -131,18 +128,20 @@ class TagController extends BaseController
                 if (!Gate::allows("user_folder", $ressource)) {
                     return $this->sendError(null, "Unauthorized access to folder", 403);
                 }
+                $tag->folders()->detach();
             } elseif (!isset($input["folder_id"]) && isset($input["bookmark_id"])) {
                 $ressource = Bookmark::find($input["bookmark_id"]);
                 if (!Gate::allows('user_bookmark', $ressource)) {
                     return $this->sendError(null, "Unauthorized access to bookmark", 403);
                 }
+                $tag->bookmarks()->detach();
             } else {
                 return $this->sendError(null, "You can't enter both a folder_id and a bookmark_id");
             }
         }
         /* if the $ressource is not null: call syncTag() with the tag id */
         if (isset($ressource)) {
-            $tag = $this->syncTag($ressource, $input, $tag->id);
+            $tag = $this->syncTag($ressource, $input, $tag);
             return $this->sendResponse(
                 new TagResource($tag),
                 "Tag updated successfully."
@@ -179,6 +178,8 @@ class TagController extends BaseController
     {
         $tag = new Tag();
         $tag->name = $name;
+        $tag->user_id = auth()->user()->id;
+        $tag->save();
         $model->tags()->attach($tag);
         return $tag;
     }
@@ -190,19 +191,18 @@ class TagController extends BaseController
      * @param int $id
      * @return \App\Models\Tag
      */
-    private function syncTag($model, $input, $id)
+    private function syncTag($ressource, $input, $tag)
     {
-        $tag = Tag::findOrFail($id);
-        $model->tags()->detach($tag);
+
         foreach ($input as $key => $value) {
-            if (!is_null($input[$key]) && $key != "id") {
+            if (!is_null($input[$key]) && $key != "id" && $key != "user_id") {
                 if (Schema::hasColumn("tags", $key)) {
                     $tag->$key = $value;
                 }
             }
         }
         $tag->save();
-        $model->tags()->attach($tag);
+        $ressource->tags()->attach($tag);
         return $tag;
     }
 }
