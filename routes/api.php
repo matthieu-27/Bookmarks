@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\API\BookmarkController;
+use App\Http\Controllers\API\FolderBookmarks;
 use App\Http\Controllers\API\FolderController;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\SearchController;
 use App\Http\Controllers\API\TagController;
+use App\Http\Resources\FolderBookmarksResource;
+use App\Models\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,7 +34,7 @@ Route::controller(RegisterController::class)->group(function () {
 Route::middleware("auth:sanctum")->group(function () {
 	//...
 	Route::apiresource("folders", FolderController::class);
-	// Route::apiresource("folders.tags", TagController::class);
+	Route::apiresource("/folders/{id}/bookmarks", FolderBookmarks::class);
 	Route::apiresource("bookmarks", BookmarkController::class);
 	// Route::apiresource("bookmarks.tags", TagController::class);
 	Route::apiresource("tags", TagController::class);

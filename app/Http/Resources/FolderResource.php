@@ -24,7 +24,7 @@ class FolderResource extends JsonResource
 				"udpate" => route("folders.update", $this->id),
 				"destroy" => route("folders.destroy", $this->id),
 			],
-			"bookmarks" => $bookmarks,
+			// "bookmarks" => $bookmarks,
 		];
 	}
 }

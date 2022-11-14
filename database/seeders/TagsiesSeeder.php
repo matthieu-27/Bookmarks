@@ -19,24 +19,24 @@ class TagsiesSeeder extends Seeder
     public function run()
     {
         // Generate users, categories and tags
-        User::factory()->create();
-        // $tags = Tag::factory()->count(15)->create();
-        // $folders = Folder::factory()->count(6)->create()->each(function (Folder $folder) use ($tags) {
-        //     if (random_int(0, 1)) {
-        //         // Attach a random number of tags to the folder
-        //         $folder->tags()->sync($tags->random(random_int(1, 8)));
-        //     }
-        // });
-        // // Generate bookmarks and attach tags to them
-        // Bookmark::factory()->count(30)->create()->each(function (Bookmark $bookmark) use ($tags, $folders) {
-        //     if (random_int(0, 1)) {
-        //         // Attach a random number of tags to the link
-        //         $bookmark->tags()->sync($tags->random(random_int(1, 8)));
-        //     }
-        //     if (random_int(0, 1)) {
-        //         // Attach a random number of folders to the link
-        //         $bookmark->folders()->sync($folders->random(random_int(1, 2)));
-        //     }
-        // });
+        // User::factory()->create();
+        $tags = Tag::factory()->count(15)->create();
+        $folders = Folder::factory()->count(8)->create()->each(function (Folder $folder) use ($tags) {
+            if (random_int(0, 1)) {
+                // Attach a random number of tags to the folder
+                $folder->tags()->sync($tags->random(random_int(1, 8)));
+            }
+        });
+        // Generate bookmarks and attach tags to them
+        Bookmark::factory()->count(30)->create()->each(function (Bookmark $bookmark) use ($tags, $folders) {
+            if (random_int(0, 1)) {
+                // Attach a random number of tags to the link
+                $bookmark->tags()->sync($tags->random(random_int(1, 8)));
+            }
+            if (random_int(0, 1)) {
+                // Attach a random number of folders to the link
+                $bookmark->folders()->attach($folders->random(random_int(1, 8)));
+            }
+        });
     }
 }
