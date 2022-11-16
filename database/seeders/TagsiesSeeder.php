@@ -21,22 +21,20 @@ class TagsiesSeeder extends Seeder
         // Generate users, categories and tags
         // User::factory()->create();
         $tags = Tag::factory()->count(15)->create();
-        $folders = Folder::factory()->count(8)->create()->each(function (Folder $folder) use ($tags) {
-            if (random_int(0, 1)) {
-                // Attach a random number of tags to the folder
-                $folder->tags()->sync($tags->random(random_int(1, 8)));
-            }
-        });
+        $folder = Folder::findOrFail(1);
+        // $folders = Folder::factory()->count(8)->create()->each(function (Folder $folder) use ($tags) {
+        //     if (random_int(0, 1)) {
+        //         // Attach a random number of tags to the folder
+        //         $folder->tags()->sync($tags->random(random_int(1, 8)));
+        //     }
+        // });
         // Generate bookmarks and attach tags to them
-        Bookmark::factory()->count(30)->create()->each(function (Bookmark $bookmark) use ($tags, $folders) {
-            if (random_int(0, 1)) {
-                // Attach a random number of tags to the link
-                $bookmark->tags()->sync($tags->random(random_int(1, 8)));
-            }
-            if (random_int(0, 1)) {
-                // Attach a random number of folders to the link
-                $bookmark->folders()->attach($folders->random(random_int(1, 8)));
-            }
+        foreach ($tags as $tag) {
+            $folder->tags()->attach($tag);
+        }
+        Bookmark::factory()->count(30)->create()->each(function (Bookmark $bookmark) use ($tags, $folder) {
+            $bookmark->tags()->sync($tags);
+            $bookmark->folders()->attach($folder);
         });
     }
 }

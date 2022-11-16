@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\BookmarkController;
 use App\Http\Controllers\API\FolderBookmarks;
 use App\Http\Controllers\API\FolderController;
+use App\Http\Controllers\API\FolderTagsController;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\SearchController;
 use App\Http\Controllers\API\TagController;
@@ -35,6 +36,7 @@ Route::middleware("auth:sanctum")->group(function () {
 	//...
 	Route::apiresource("folders", FolderController::class);
 	Route::apiresource("/folders/{id}/bookmarks", FolderBookmarks::class);
+	Route::apiresource("/folders/{id}/tags", FolderTagsController::class);
 	Route::apiresource("bookmarks", BookmarkController::class);
 	// Route::apiresource("bookmarks.tags", TagController::class);
 	Route::apiresource("tags", TagController::class);

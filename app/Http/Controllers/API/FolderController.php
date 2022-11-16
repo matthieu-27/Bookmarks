@@ -23,7 +23,8 @@ class FolderController extends BaseController
 	public function index()
 	{
 		$folders = Folder::byUser()->get();
-		return $this->sendResponse(FolderResource::collection($folders), "Success");
+		// return $this->sendResponse(FolderResource::collection($folders), "Success");
+		return response()->json($folders);
 	}
 
 	/**
@@ -60,10 +61,7 @@ class FolderController extends BaseController
 		if (!Gate::allows('user_folder', $folder)) {
 			return $this->sendError(null, "Unauthorized access to parent folder", 403);
 		}
-		return $this->sendResponse(
-			new FolderResource($folder),
-			"Folder created successfully."
-		);
+		return response()->json($folder);
 	}
 
 	/**
@@ -78,10 +76,7 @@ class FolderController extends BaseController
 			return $this->sendError(null, "Unauthorized access to folder", 403);
 		}
 
-		return $this->sendResponse(
-			new FolderResource($folder),
-			"Folder retrieved successfully."
-		);
+		return response()->json($folder);
 	}
 
 	/**
@@ -119,10 +114,7 @@ class FolderController extends BaseController
 
 		$folder->save();
 
-		return $this->sendResponse(
-			new FolderResource($folder),
-			"Folder updated successfully."
-		);
+		return response()->json($folder);
 	}
 
 	/**

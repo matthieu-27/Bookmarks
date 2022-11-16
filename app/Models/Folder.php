@@ -28,7 +28,6 @@ class Folder extends Model
 {
 	use HasFactory;
 	protected $hidden = ['pivot'];
-	public $timestamps = false;
 
 	/**
 	 * Scope for the user relation
@@ -55,7 +54,7 @@ class Folder extends Model
 	 */
 	public function bookmarks(): BelongsToMany
 	{
-		return $this->belongsToMany(Bookmark::class, 'folder_bookmarks', 'bookmark_id', 'folder_id');
+		return $this->belongsToMany(Bookmark::class, 'folder_bookmarks', 'folder_id', 'bookmark_id');
 	}
 
 	/**

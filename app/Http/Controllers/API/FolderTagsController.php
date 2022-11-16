@@ -2,25 +2,26 @@
 
 namespace App\Http\Controllers\API;
 
-use App\Http\Resources\BookmarkResource;
-
 use App\Http\Controllers\Controller;
-use App\Models\Bookmark;
+use App\Http\Resources\TagResource;
 use App\Models\Folder;
 use Illuminate\Http\Request;
 
-class FolderBookmarks extends BaseController
+class FolderTagsController extends BaseController
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function index(int $id)
     {
         $folder = Folder::findOrFail($id);
-        $bookmarks = $folder->bookmarks()->get();
-        return response()->json($bookmarks);
+        $bookmarks = $folder->tags()->get();
+        return $this->sendResponse(
+            TagResource::collection($bookmarks),
+            "Success"
+        );
     }
 
     /**
