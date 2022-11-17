@@ -22,10 +22,7 @@ class BookmarkController extends BaseController
 	{
 		//
 		$bookmarks = Bookmark::byUser()->get();
-		return $this->sendResponse(
-			BookmarkResource::collection($bookmarks),
-			"Success"
-		);
+		return response()->json($bookmarks);
 	}
 
 	/**

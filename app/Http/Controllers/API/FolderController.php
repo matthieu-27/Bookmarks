@@ -75,7 +75,6 @@ class FolderController extends BaseController
 		if (!Gate::allows('user_folder', $folder)) {
 			return $this->sendError(null, "Unauthorized access to folder", 403);
 		}
-
 		return response()->json($folder);
 	}
 
