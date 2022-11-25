@@ -20,8 +20,11 @@ class TagsiesSeeder extends Seeder
     {
         // Generate users, categories and tags
         // User::factory()->create();
-        $tags = Tag::factory()->count(15)->create();
-        $folder = Folder::findOrFail(1);
+        $rfolder = Folder::findOrFail(1);
+        $folders1 = Folder::factory()->count(3)->create()->each(function (Folder $folder) use ($rfolder) {
+            $folder->folders()->attach($rfolder);
+        });
+        // $tags = Tag::factory()->count(15)->create();
         // $folders = Folder::factory()->count(8)->create()->each(function (Folder $folder) use ($tags) {
         //     if (random_int(0, 1)) {
         //         // Attach a random number of tags to the folder
@@ -29,12 +32,12 @@ class TagsiesSeeder extends Seeder
         //     }
         // });
         // Generate bookmarks and attach tags to them
-        foreach ($tags as $tag) {
-            $folder->tags()->attach($tag);
-        }
-        Bookmark::factory()->count(30)->create()->each(function (Bookmark $bookmark) use ($tags, $folder) {
-            $bookmark->tags()->sync($tags);
-            $bookmark->folders()->attach($folder);
-        });
+        // foreach ($tags as $tag) {
+        //     $folder->tags()->attach($tag);
+        // }
+        // Bookmark::factory()->count(30)->create()->each(function (Bookmark $bookmark) use ($tags, $folder) {
+        //     $bookmark->tags()->sync($tags);
+        //     $bookmark->folders()->attach($folder);
+        // });
     }
 }

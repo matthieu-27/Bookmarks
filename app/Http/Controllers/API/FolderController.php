@@ -23,8 +23,9 @@ class FolderController extends BaseController
 	public function index()
 	{
 		$folders = Folder::byUser()->get();
-		// return $this->sendResponse(FolderResource::collection($folders), "Success");
-		return response()->json($folders);
+
+		// return $this->sendResponse(F	olderResource::collection($folders), "Success");
+		return response()->json(FolderResource::collection($folders));
 	}
 
 	/**

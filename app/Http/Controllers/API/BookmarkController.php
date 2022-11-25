@@ -88,10 +88,7 @@ class BookmarkController extends BaseController
 		if (!Gate::allows('user_bookmark', $bookmark)) {
 			return $this->sendError(null, "Unauthorized access to bookmark", 403);
 		}
-		return $this->sendResponse(
-			new BookmarkResource($bookmark),
-			"Bookmark retrieved successfully."
-		);
+		return response()->json($bookmark);
 	}
 
 	/**

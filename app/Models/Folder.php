@@ -47,8 +47,15 @@ class Folder extends Model
 	/*
      | ========================================================================
      | RELATIONSHIPS
-     */
+    */
 
+	/**
+	 * @return BelongsToMany
+	 */
+	public function folders(): BelongsToMany
+	{
+		return $this->belongsToMany(Folder::class, 'folder_folders', 'root_id', 'folder_id');
+	}
 	/**
 	 * @return BelongsToMany
 	 */
