@@ -13,11 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('folder_folders', function (Blueprint $table) {
-            $table->integer('root_id')->unsigned();
-            $table->integer('folder_id')->unsigned();
-
-            $table->primary(['root_id', 'folder_id']);
+        Schema::table('folders', function (Blueprint $table) {
+            $table->foreignId('parent_id')->references('id')->on('folders');
         });
     }
 
@@ -28,6 +25,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('folder_folders');
+        Schema::table('folders', function (Blueprint $table) {
+            $table->dropForeign(['parent_id']);
+            $table->dropColumn('parent_id');
+        });
     }
 };

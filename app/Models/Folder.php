@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Folder
@@ -50,11 +51,18 @@ class Folder extends Model
     */
 
 	/**
-	 * @return BelongsToMany
+	 * @return BelongsTo
 	 */
-	public function folders(): BelongsToMany
+	public function parent(): BelongsTo
 	{
-		return $this->belongsToMany(Folder::class, 'folder_folders', 'root_id', 'folder_id');
+		return $this->belongsTo(Folder::class, 'parent_id');
+	}
+	/**
+	 * @return HasMany
+	 */
+	public function children(): HasMany
+	{
+		return $this->hasMany(Folder::class, 'parent_id');
 	}
 	/**
 	 * @return BelongsToMany
