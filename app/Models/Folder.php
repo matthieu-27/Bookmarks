@@ -45,11 +45,21 @@ class Folder extends Model
 		return $query->where('user_id', $user_id);
 	}
 
+	/**
+	 * Scope where parent_id = NULL ( Return root folder )
+	 * 
+	 * @param Builder $query
+	 * @return Builder
+	 */
+	public function scopeRootFolder(Builder $query): Builder
+	{
+		return $query->where('parent_id', null);
+	}
+
 	/*
      | ========================================================================
      | RELATIONSHIPS
     */
-
 	/**
 	 * @return BelongsTo
 	 */
@@ -71,7 +81,6 @@ class Folder extends Model
 	{
 		return $this->belongsToMany(Bookmark::class, 'folder_bookmarks', 'folder_id', 'bookmark_id');
 	}
-
 	/**
 	 * @return BelongsTo
 	 */
@@ -79,7 +88,6 @@ class Folder extends Model
 	{
 		return $this->belongsTo(User::class, 'user_id');
 	}
-
 	/**
 	 * @return BelongsToMany
 	 */

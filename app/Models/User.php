@@ -59,6 +59,7 @@ class User extends Authenticatable
 		$folder = new Folder();
 		$folder->name = "root";
 		$folder->user_id = $model->id;
+		$folder->parent_id = null;
 		$folder->save();
 		$folder->user()->associate($model);
 		return $model;

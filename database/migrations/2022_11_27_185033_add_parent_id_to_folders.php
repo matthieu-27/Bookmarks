@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('folders', function (Blueprint $table) {
-            $table->foreignId('parent_id')->references('id')->on('folders');
+            $table->foreignId('parent_id')->nullable()->references('id')->on('folders');
         });
     }
 

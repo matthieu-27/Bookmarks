@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->integer('user_id')->unsigned();
             $table->text("name");
+            $table->slug();
             $table->timestamps();
         });
     }

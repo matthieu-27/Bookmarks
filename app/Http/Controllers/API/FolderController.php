@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\FolderResource;
 use App\Models\Bookmark;
 use App\Models\Folder;
+use Database\Factories\FolderFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,10 +23,9 @@ class FolderController extends BaseController
 	 */
 	public function index()
 	{
-		$folders = Folder::byUser()->get();
-
-		// return $this->sendResponse(F	olderResource::collection($folders), "Success");
-		return response()->json($folders);
+		$folder = Folder::byUser()->rootFolder()->first();
+		$folders = $folder->children;
+		return response()->json(FolderResource::collection($folders));
 	}
 
 	/**
@@ -40,6 +40,7 @@ class FolderController extends BaseController
 
 		$validator = Validator::make($input, [
 			"name" => "required",
+			"parent_id" => "integer|nullable"
 		]);
 
 		if ($validator->fails()) {
@@ -48,10 +49,16 @@ class FolderController extends BaseController
 		$folder = new Folder();
 		$folder->user_id = auth()->user()->id;
 
+		if (isset($input['parent_id'])) {
+			$parent = Folder::findOrFail($input["parent_id"]);
+		} else {
+			$parent = Folder::byUser()->rootFolder()->first();
+		}
+		$folder->parent_id = $parent->id;
 
 		foreach ($input as $key => $value) {
 			if (isset($input[$key])) {
-				if (Schema::hasColumn('folders', $key) && $key != "id" && $key != "user_id") {
+				if (Schema::hasColumn('folders', $key) && !str_contains($key, "id")) {
 					$folder->$key = $value;
 				}
 			}
@@ -62,7 +69,8 @@ class FolderController extends BaseController
 		if (!Gate::allows('user_folder', $folder)) {
 			return $this->sendError(null, "Unauthorized access to parent folder", 403);
 		}
-		return response()->json($folder);
+
+		return response()->json(new FolderResource($folder));
 	}
 
 	/**
