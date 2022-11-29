@@ -23,14 +23,8 @@ class TagResource extends JsonResource
         return [
             "id" => $this->id,
             "name" => $this->name,
-            "links" => [
-                "show" => route("tags.show", $this->id),
-                "store" => route("tags.store"),
-                "udpate" => route("tags.update", $this->id),
-                "destroy" => route("tags.destroy", $this->id),
-            ],
             "folders" => $folders,
-            "bookmarks" => $bookmarks,
+            "bookmarks" => $bookmarks
         ];
     }
 }

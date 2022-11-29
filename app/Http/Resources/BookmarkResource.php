@@ -19,13 +19,7 @@ class BookmarkResource extends JsonResource
 			"title" => $this->title,
 			"url" => $this->url,
 			"description" => $this->description,
-			"thumbnail" => $this->thumbnail,
-			"links" => [
-				"show" => route("bookmarks.show", $this->id),
-				"store" => route("bookmarks.store"),
-				"udpate" => route("bookmarks.update", $this->id),
-				"destroy" => route("bookmarks.destroy", $this->id),
-			],
+			"thumbnail" => $this->thumbnail
 		];
 	}
 }

@@ -17,12 +17,8 @@ class TagController extends BaseController
 
     public function index()
     {
-        $tags = Tag::byUser()->get();
-
-        return $this->sendResponse(
-            TagResource::collection($tags),
-            "Success"
-        );
+        $tags = Tag::byUser()->with(['bookmarks', 'folders'])->get();
+        return response()->json(TagResource::collection($tags));
     }
 
     /**
