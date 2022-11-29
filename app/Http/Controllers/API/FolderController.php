@@ -32,7 +32,7 @@ class FolderController extends BaseController
 	 * Store a newly created resource in storage.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
-	 * @return \Illuminate\Http\Response
+	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function store(Request $request)
 	{
@@ -50,10 +50,19 @@ class FolderController extends BaseController
 		$folder->user_id = auth()->user()->id;
 
 		if (isset($input['parent_id'])) {
-			$parent = Folder::findOrFail($input["parent_id"]);
+			try {
+				$parent = Folder::findOrFail($input["parent_id"]);
+			} catch (\Throwable $th) {
+				return response()->json("Cannot find folder.", 404);
+			}
 		} else {
 			$parent = Folder::byUser()->rootFolder()->first();
 		}
+
+		if (!Gate::allows('user_folder', $parent)) {
+			return response()->json("Unauthorized access to parent folder", 403);
+		}
+
 		$folder->parent_id = $parent->id;
 
 		foreach ($input as $key => $value) {
@@ -65,10 +74,6 @@ class FolderController extends BaseController
 		}
 
 		$folder->save();
-
-		if (!Gate::allows('user_folder', $folder)) {
-			return $this->sendError(null, "Unauthorized access to parent folder", 403);
-		}
 
 		return response()->json(new FolderResource($folder));
 	}
