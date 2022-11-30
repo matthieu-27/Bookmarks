@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\FolderBookmarksResource;
 use App\Http\Resources\FolderResource;
 use App\Models\Bookmark;
 use App\Models\Folder;
@@ -89,10 +90,9 @@ class FolderController extends BaseController
 		if (!Gate::allows('user_folder', $folder)) {
 			return $this->sendError(null, "Unauthorized access to folder", 403);
 		}
-		$root = Folder::byUser()->rootFolder()->first();
-		$bookmarks = $folder->with('bookmarks')->get();
-		$bookmarks = $bookmarks->pull($root->id);
-		return response()->json($bookmarks);
+		$bookmarks = $folder->bookmarks()->get();
+		$folder->bookmarks = $bookmarks;
+		return response()->json(new FolderBookmarksResource($folder));
 	}
 
 	/**
