@@ -1,6 +1,4 @@
-![Logo](https://i.imgur.com/yqqNGJY.png)
-
-Tagsies's a school project made with <em>Laravel</em>, it's a Web App and an Api to Collect, Organize, Search <em>Folders</em> or <em>Bookmarks</em> with <em>Tags</em>.
+School project made with <em>Laravel</em>, it's a Web App and an Api to Collect, Organize, Search <em>Folders</em> or <em>Bookmarks</em> with <em>Tags</em>.
 
 ## Run Locally
 
