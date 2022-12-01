@@ -25,7 +25,7 @@ class FolderController extends BaseController
 	public function index()
 	{
 		$folder = Folder::byUser()->rootFolder()->first();
-		$folders = $folder->children()->with(['tags', 'children'])->get();
+		$folders = $folder->children()->with('children')->get();
 		return response()->json(FolderResource::collection($folders));
 	}
 

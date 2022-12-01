@@ -20,9 +20,7 @@ class FolderResource extends JsonResource
 			"description" => $this->description,
 			"created_at" => $this->created_at,
 			"updated_at" => $this->updated_at,
-			"parent_id" => $this->parent_id,
-			"tags" => $this->tags,
-			"children" => $this->children
+			"parent_id" => $this->parent_id
 		];
 	}
 }

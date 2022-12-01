@@ -18,10 +18,7 @@ class FolderTagsController extends BaseController
     {
         $folder = Folder::findOrFail($id);
         $bookmarks = $folder->tags()->get();
-        return $this->sendResponse(
-            TagResource::collection($bookmarks),
-            "Success"
-        );
+        return response()->json($bookmarks);
     }
 
     /**
