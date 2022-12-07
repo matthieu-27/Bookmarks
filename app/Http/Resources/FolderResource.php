@@ -14,7 +14,6 @@ class FolderResource extends JsonResource
 	 */
 	public function toArray($request)
 	{
-		$children = FolderResource::collection($this->children()->get());
 		return [
 			"id" => $this->id,
 			"name" => $this->name,
@@ -22,7 +21,7 @@ class FolderResource extends JsonResource
 			"created_at" => $this->created_at,
 			"updated_at" => $this->updated_at,
 			"parent_id" => $this->parent_id,
-			"children" => $children
+			"children" => FolderResource::collection($this->children)
 		];
 	}
 }
