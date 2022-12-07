@@ -20,12 +20,13 @@ class FolderController extends BaseController
 	/**
 	 * Display a listing of the user resource.
 	 *
-	 * @return mixed
+	 * @return \Illuminate\Http\JsonResponse
 	 */
 	public function index()
 	{
 		$folder = Folder::byUser()->rootFolder()->first();
-		$folders = $folder->children()->with('children')->get();
+		$folders = $folder->children()->get();
+
 		return response()->json(FolderResource::collection($folders));
 	}
 
@@ -90,8 +91,7 @@ class FolderController extends BaseController
 		if (!Gate::allows('user_folder', $folder)) {
 			return $this->sendError(null, "Unauthorized access to folder", 403);
 		}
-		$bookmarks = $folder->bookmarks()->get();
-		$folder->bookmarks = $bookmarks;
+
 		return response()->json(new FolderBookmarksResource($folder));
 	}
 

@@ -14,7 +14,7 @@ class FolderBookmarksResource extends JsonResource
      */
     public function toArray($request)
     {
-        $bookmarks = BookmarkResource::collection($this->bookmarks);
+        $bookmarks = BookmarkResource::collection($this->bookmarks()->get());
         return [
             "id" => $this->id,
             "name" => $this->name,
