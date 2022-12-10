@@ -52,6 +52,7 @@ class RegisterController extends BaseController
 			$success["name"] = $user->name;
 			$success["id"] = $user->id;
 			$success["email"] = $user->email;
+			$success["root_id"] = $user->getRootId();
 			return response()->json($success);
 		} else {
 			return response()->json("Login failed", 403);

@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use Carbon\Carbon;
+use Faker\Core\Number;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -41,7 +42,7 @@ class User extends Authenticatable
 	 *
 	 * @var array<int, string>
 	 */
-	protected $hidden = ["password", "remember_token"];
+	protected $hidden = ["password", "remember_token", "two_factor_secret", "two_factor_recovery_codes"];
 
 	/**
 	 * The attributes that should be cast.
@@ -51,6 +52,11 @@ class User extends Authenticatable
 	protected $casts = [
 		"email_verified_at" => "datetime",
 	];
+
+	public function getRootId()
+	{
+		return Folder::byUser()->rootFolder()->first()->id;
+	}
 
 	public static function create($attributes)
 	{
