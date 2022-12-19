@@ -35,6 +35,7 @@ Route::controller(RegisterController::class)->group(function () {
 
 Route::middleware("auth:sanctum")->group(function () {
 	//...
+	Route::get("/user/{id}", [UserController::class, "getRootFolder"]);
 	Route::apiresource("folders", FolderController::class);
 	Route::apiresource("folders/{id}/bookmarks", FolderBookmarks::class);
 	Route::apiresource("folders/{id}/tags", FolderTagsController::class);

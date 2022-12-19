@@ -53,7 +53,11 @@ class User extends Authenticatable
 		"email_verified_at" => "datetime",
 	];
 
-	public function getRootId()
+	/**
+	 * Summary of getRootId
+	 * @return int
+	 */
+	public function getRootId(): int
 	{
 		return Folder::byUser()->rootFolder()->first()->id;
 	}

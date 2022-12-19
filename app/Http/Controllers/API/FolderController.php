@@ -144,10 +144,7 @@ class FolderController extends BaseController
 		if (!Gate::allows("user_folder", $folder)) {
 			return $this->sendError("Unauthorized access to folder", "Unauthorized access to folder", 403);
 		}
-		$bookmarks = $folder->bookmarks()->get();
-		foreach ($bookmarks as $bookmark) {
-			$bookmark->delete();
-		}
+		$folder->parent()->disassociate();
 		$folder->bookmarks()->detach();
 		$folder->tags()->detach();
 		$folder->delete();

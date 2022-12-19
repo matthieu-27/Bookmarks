@@ -3,12 +3,21 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\FolderResource;
 use App\Http\Resources\UserResource;
+use App\Models\Folder;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+
+    public function getRootFolder()
+    {
+        $rep = Folder::byUser()->rootFolder()->first();
+        return response()->json($rep);
+    }
+
     /**
      * Display a listing of the resource.
      *
