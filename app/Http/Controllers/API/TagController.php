@@ -7,6 +7,7 @@ use App\Models\Bookmark;
 use App\Models\Folder;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
@@ -33,13 +34,13 @@ class TagController extends BaseController
         $input = $request->all();
 
         $validator = Validator::make($input, [
-            "name" => "required|unique:tags",
+            "name" => 'required|unique:tags,name,NULL,id,user_id,' . Auth::user()->id,
             "folder_id" => "integer|nullable",
             "bookmark_id" => "integer|nullable"
         ]);
 
         if ($validator->fails()) {
-            return $this->sendError("Validation Error.", $validator->errors());
+            return $this->sendError($validator->errors(), 401);
         }
 
         /* Checking if folder_id and bookmark_id are set */

@@ -17,19 +17,22 @@ class RegisterController extends BaseController
 	 */
 	public function register(Request $request)
 	{
+		$email_check = Validator::make($request->all(), ["email" => "required|email|unique:users"]);
+		if($email_check->fails()){
+			return $this->sendError($email_check->errors(), 401);
+		}
 		$validator = Validator::make($request->all(), [
 			"name" => "required",
-			"email" => "required|email",
 			"password" => "required",
 			"c_password" => "required|same:password",
 		]);
 		if ($validator->fails()) {
-			return $this->sendError("Validation Error.", $validator->errors());
+			return $this->sendError($validator->errors(), 401);
 		}
 		$input = $request->all();
 		$input["password"] = bcrypt($input["password"]);
 		$user = User::create($input);
-		$success["token"] = $user->createToken("MyApp")->plainTextToken;
+		$success["token"] = $user->createToken("bookmarks")->plainTextToken;
 		$success["name"] = $user->name;
 		return $this->sendResponse($success, "User register successfully.");
 	}
@@ -58,4 +61,5 @@ class RegisterController extends BaseController
 			return response()->json("Login failed", 403);
 		}
 	}
+
 }
