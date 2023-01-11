@@ -24,9 +24,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware("auth:sanctum")->get("/user", function (Request $request) {
-	return $request->user();
-});
+
 
 Route::controller(RegisterController::class)->group(function () {
 	Route::post("register", "register");
@@ -35,7 +33,7 @@ Route::controller(RegisterController::class)->group(function () {
 
 Route::middleware("auth:sanctum")->group(function () {
 	//...
-	Route::get("/user/{id}", [UserController::class, "getRootFolder"]);
+	Route::get("/user/{id}", [UserController::class, "show"]);
 	Route::apiresource("folders", FolderController::class);
 	Route::apiresource("folders/{id}/bookmarks", FolderBookmarks::class);
 	Route::apiresource("folders/{id}/tags", FolderTagsController::class);
@@ -46,5 +44,4 @@ Route::middleware("auth:sanctum")->group(function () {
 		->name('api.search.bookmarks');
 	Route::post('search/tags/', [SearchController::class, 'searchTags'])
 		->name('api.search.tags');
-	Route::apiresource("users", UserController::class);
 });

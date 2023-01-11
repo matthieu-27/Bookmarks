@@ -15,12 +15,14 @@ class FolderBookmarksResource extends JsonResource
     public function toArray($request)
     {
         $bookmarks = BookmarkResource::collection($this->bookmarks()->get());
+        $children = FolderResource::collection($this->children()->get());
         return [
             "id" => $this->id,
             "name" => $this->name,
             "created_at" => $this->created_at,
             "updated_at" => $this->updated_at,
-            "bookmarks" => $bookmarks
+            "bookmarks" => $bookmarks,
+            "children" => $children
         ];
     }
 }

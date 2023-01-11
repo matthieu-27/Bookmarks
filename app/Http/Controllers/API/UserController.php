@@ -8,6 +8,7 @@ use App\Http\Resources\UserResource;
 use App\Models\Folder;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -47,8 +48,8 @@ class UserController extends Controller
      */
     public function show($id)
     {
-        //
         $user = User::findOrFail($id);
+        if (Auth::user()->id !== $user->id) return response()->json("Unauthorized", 403);
         return response()->json(new UserResource($user));
     }
 

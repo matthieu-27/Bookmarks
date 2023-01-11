@@ -92,7 +92,7 @@ class FolderController extends BaseController
 			return $this->sendError(null, "Unauthorized access to folder", 403);
 		}
 
-		return response()->json(new FolderBookmarksResource($folder));
+		return response()->json(new FolderResource($folder));
 	}
 
 	/**
